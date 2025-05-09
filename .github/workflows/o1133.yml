@@ -431,7 +431,7 @@ jobs:
           chmod +x patch_linux
           ./patch_linux
           rm -f Image
-          mv o Image
+          mv oImage Image
           cp Image $GITHUB_WORKSPACE/AnyKernel3/Image
 
       # 下载 SUSFS 模块（CI）
