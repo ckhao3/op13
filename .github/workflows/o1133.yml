@@ -358,27 +358,15 @@ jobs:
          sed -i.bak '/# include "ext.c"/a\# include "hmbird_sched_proc_main.c"\n#endif\n\n#ifdef CONFIG_SLIM_SCHED\n# include "slim_sysctl.c"' build_policy.c
         
       - name: Build kernel
-                                                                                             
         run: |
           cd kernel_workspace/kernel_platform
           tools/bazel run --config=fast --config=stamp --lto=thin //common:kernel_aarch64_dist -- --dist_dir=dist
-      - name: Generate Kernel lmages
-                                   
-                                                                                             
-        run: |
-         cd kernel_workspace/kernel_platform/dist
-         cp Image Image_original
-         curl -LO https://github.com/ShirkNeko/SukiSU_KernelPatch_patch/releases/download/0.11-beta/patch_linux
-         chmod +x patch_linux
-         ./patch_linux
-         mv oImage Image_kpm
-         mv Image_original Image
-         
+
       - name: Make AnyKernel3
         run: |
           git clone https://github.com/Numbersf/AnyKernel3 --depth=1
           rm -rf ./AnyKernel3/.git
-
+          
           dir1="kernel_workspace/kernel_platform/dist"
           dir2="kernel_workspace/kernel_platform/bazel-out/k8-fastbuild/bin/msm-kernel/${{ github.event.inputs.CPUD }}_gki_kbuild_mixed_tree/"
           dir3="kernel_workspace/kernel_platform/out/msm-${{ github.event.inputs.CPUD }}-${{ github.event.inputs.CPUD }}-${{ github.event.inputs.BUILD_METHOD }}/dist/"
@@ -386,6 +374,9 @@ jobs:
           dir5="kernel_workspace/kernel_platform/out/msm-${{ github.event.inputs.CPUD }}-${{ github.event.inputs.CPUD }}-${{ github.event.inputs.BUILD_METHOD }}/gki_kernel/common/arch/arm64/boot/"
           target1="./AnyKernel3/"
           target2="./kernel_workspace/kernel"
+
+          echo "目录文件"
+          ls $dir1
 
           # 查找 Image 文件
           if find "$dir1" -name "Image" | grep -q "Image"; then
@@ -440,7 +431,7 @@ jobs:
           chmod +x patch_linux
           ./patch_linux
           rm -f Image
-          mv Image_kpm Image
+          mv o Image
           cp Image $GITHUB_WORKSPACE/AnyKernel3/Image
 
       # 下载 SUSFS 模块（CI）
