@@ -376,7 +376,10 @@ jobs:
           target2="./kernel_workspace/kernel"
 
           echo "目录文件"
-          ls $dir1
+          ls -l $dir1
+
+          echo "查找dtbo.img"
+          find . -name *.img -exec ls -l {} \;
 
           # 查找 Image 文件
           if find "$dir1" -name "Image" | grep -q "Image"; then
