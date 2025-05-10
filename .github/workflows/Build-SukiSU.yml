@@ -6,7 +6,7 @@ on:
         type: choice
         description: "分支"
         required: true
-        default: sm8750
+        default: sm8550
         options:
           - sm7550
           - sm7675
@@ -19,7 +19,7 @@ on:
         type: choice
         description: "配置文件"
         required: true
-        default: oneplus_13
+        default: oneplus_ace2pro_v
         options:
           - oneplus_nord_ce4_v
           - oneplus_ace_3v_v
@@ -40,13 +40,14 @@ on:
           - oneplus_ace5
           - oneplus_pad2_v
           - oneplus_13
+          - oneplus_13t
           - oneplus_ace5_pro
           - GitHub有bug可能不显示最后一项,误使用此项
       CPUD:
         type: choice
         description: "处理器代号"
         required: true
-        default: sun
+        default: kalama
         options:
           - crow
           - waipio
@@ -57,7 +58,7 @@ on:
         type: choice
         description: "内核安卓版本"
         required: true
-        default: android15
+        default: android13
         options:
           - android12
           - android13
@@ -67,7 +68,7 @@ on:
        type: choice
        description: "内核版本"
        required: true
-       default: "6.6"
+       default: "5.15"
        options:
          - "5.10"
          - "5.15"
@@ -100,7 +101,7 @@ on:
         type: boolean
         description: "是否启用添加更多的ZRAM算法？"
         required: true
-        default: true
+        default: false
 
 jobs:
   build:
@@ -151,7 +152,7 @@ jobs:
         run: |
           mkdir kernel_workspace && cd kernel_workspace
           repo init -u https://github.com/OnePlusOSS/kernel_manifest.git -b refs/heads/oneplus/${{ github.event.inputs.CPU }} -m ${{ github.event.inputs.FEIL }}.xml --depth=1
-          repo --trace sync -c -j$(nproc --all) --no-tags
+          repo sync
           if [  -e kernel_platform/common/BUILD.bazel ]; then
           sed -i '/^[[:space:]]*"protected_exports_list"[[:space:]]*:[[:space:]]*"android\/abi_gki_protected_exports_aarch64",$/d' kernel_platform/common/BUILD.bazel
           fi
@@ -340,8 +341,7 @@ jobs:
         if: ${{ github.event.inputs.CPU != 'sm8650' && github.event.inputs.CPU != 'sm7675' }}
         run: |
          cd kernel_workspace
-         # LTO=thin SYSTEM_DLKM_RE_SIGN=0 BUILD_SYSTEM_DLKM=0 KMI_SYMBOL_LIST_STRICT_MODE=0 ./kernel_platform/oplus/build/oplus_build_kernel.sh ${{ github.event.inputs.CPUD }} ${{ github.event.inputs.BUILD_METHOD }}
-         tools/bazel run --config=fast --config=stamp --lto=thin //common:kernel_aarch64_dist -- --dist_dir=dist
+         LTO=thin SYSTEM_DLKM_RE_SIGN=0 BUILD_SYSTEM_DLKM=0 KMI_SYMBOL_LIST_STRICT_MODE=0 ./kernel_platform/oplus/build/oplus_build_kernel.sh ${{ github.event.inputs.CPUD }} ${{ github.event.inputs.BUILD_METHOD }}
 
       - name: Make AnyKernel3
         run: |
